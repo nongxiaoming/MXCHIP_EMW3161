@@ -1,0 +1,41 @@
+Import('RTT_ROOT')
+Import('rtconfig')
+from building import *
+
+# get current directory
+cwd     = GetCurrentDir()
+
+src	= Split("""
+board.c
+drv_usart.c
+drv_wifi.c
+stm32f2xx_it.c
+""")
+
+# add RTC driver.
+if GetDepend('RT_USING_RTC') == True:
+	src += ['drv_rtc.c']
+
+# add SD driver.
+if GetDepend('RT_USING_DFS') == True:
+	src += ['drv_sd.c']
+
+# add ethernet driver.
+if GetDepend('RT_USING_LWIP') == True:
+	src += ['drv_emac.c']
+
+# add spi driver.
+if GetDepend('RT_USING_SPI') == True:
+	src += ['drv_spi.c']
+
+# add i2c driver.
+if GetDepend('RT_USING_I2C') == True:
+	src += ['drv_i2c.c']
+
+
+CPPPATH = [cwd]
+
+group = DefineGroup('Drivers', src, depend = [''], CPPPATH = CPPPATH)
+
+Return('group')
+

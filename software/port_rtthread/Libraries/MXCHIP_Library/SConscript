@@ -1,0 +1,19 @@
+from building import *
+Import('rtconfig')
+
+cwd     = GetCurrentDir()
+src     = Glob('*.c')
+CPPPATH = [cwd]
+if not src:
+    if rtconfig.WIFI_TYPE == 'EWM3161':
+        LIBS    = ['mxchipWNet_3161']
+    else:
+        LIBS    = ['mxchipWNet_3162']
+    LIBPATH = [cwd]
+else:
+    LIBS    = []
+    LIBPATH = []
+
+group   = DefineGroup('MXCHIP_Library', src, depend = [''], CPPPATH = CPPPATH, LIBS = LIBS, LIBPATH=LIBPATH)
+
+Return('group')
