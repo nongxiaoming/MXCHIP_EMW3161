@@ -36,6 +36,7 @@ If the buffer is not setted, stack would use the default size: 2048bytes.
 
 network_InitTypeDef_st wNetConfig;
 net_para_st para;
+static rt_mutex_t wifi_lock;
 
 void system_version(char *str, int len)
 {
@@ -132,7 +133,9 @@ void wifi_thread_entry(void* parameter)
   stationModeStart();
   softAPModeStart();
 	while(1){
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
   mxchipTick();
+  rt_mutex_release(wifi_lock);
 	rt_thread_delay(1);
 	}
 }
@@ -140,7 +143,8 @@ void wifi_thread_entry(void* parameter)
 int wifi_thread_init(void)
 {
 	rt_thread_t tid;
-
+  wifi_lock=rt_mutex_create("wifi",RT_IPC_FLAG_FIFO);
+	
 	tid = rt_thread_create("mx_wifi",
 								wifi_thread_entry, RT_NULL,
 								2048,RT_WIFI_ETHTHREAD_PRIORITY, 16);

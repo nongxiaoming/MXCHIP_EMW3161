@@ -128,6 +128,7 @@
             <RestoreFunctions>1</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
             <LimitSpeedToRealTime>0</LimitSpeedToRealTime>
+            <RestoreSysVw>1</RestoreSysVw>
           </Simulator>
           <Target>
             <UseTarget>1</UseTarget>
@@ -139,8 +140,8 @@
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
             <RestoreTracepoints>1</RestoreTracepoints>
-            <RestoreTracepoints>1</RestoreTracepoints>
-            <RestoreTracepoints>1</RestoreTracepoints>
+            <RestoreSysVw>1</RestoreSysVw>
+            <UsePdscDebugDescription>1</UsePdscDebugDescription>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>7</TargetSelection>
@@ -359,7 +360,7 @@
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>EMW3161 USE_STDPERIPH_DRIVER</Define>
+              <Define>EMW3161 USE_STDPERIPH_DRIVER STM32F2XX</Define>
               <Undefine></Undefine>
               <IncludePath>.;Drivers;F:/rt-thread/components/drivers/include;F:/rt-thread/components/finsh;F:/rt-thread/components/libc/armlibc;F:/rt-thread/include;F:/rt-thread/libcpu/arm/common;F:/rt-thread/libcpu/arm/cortex-m3;Libraries\CMSIS\CM3\DeviceSupport\ST\STM32F2xx;Libraries\MXCHIP_Library;Libraries\STM32F2xx_StdPeriph_Driver\inc;applications</IncludePath>
             </VariousControls>
