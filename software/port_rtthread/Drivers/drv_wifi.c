@@ -29,20 +29,15 @@ If there is not enough memory for a connection:
 If the buffer is not setted, stack would use the default size: 2048bytes.
 */
 //#define DynamicMemAlloc          
-#define AP_NAME           "rtthread_11n"
+#define AP_NAME           "rtthread_11BG"
 #define AP_PASSWORD       "rtthread_finsh"
 #define WEB_SERVER				"www.baidu.com"
-#define APP_INFO          "mxchipWNet Demo: TCP UDP ECHO"
 
 network_InitTypeDef_st wNetConfig;
 net_para_st para;
 static rt_mutex_t wifi_lock;
 
-void system_version(char *str, int len)
-{
-  rt_snprintf( str, len, "%s", APP_INFO);
-}
-		
+	
 void userWatchDog(void)
 {
 }
