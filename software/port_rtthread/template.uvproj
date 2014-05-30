@@ -128,6 +128,7 @@
             <RestoreFunctions>1</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
             <LimitSpeedToRealTime>0</LimitSpeedToRealTime>
+            <RestoreSysVw>1</RestoreSysVw>
           </Simulator>
           <Target>
             <UseTarget>1</UseTarget>
@@ -138,9 +139,9 @@
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
-            <RestoreTracepoints>0</RestoreTracepoints>
             <RestoreTracepoints>1</RestoreTracepoints>
-            <RestoreTracepoints>1</RestoreTracepoints>
+            <RestoreSysVw>1</RestoreSysVw>
+            <UsePdscDebugDescription>1</UsePdscDebugDescription>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>7</TargetSelection>
@@ -169,7 +170,7 @@
             <Capability>1</Capability>
             <DriverSelection>4099</DriverSelection>
           </Flash1>
-          <bUseTDR>0</bUseTDR>
+          <bUseTDR>1</bUseTDR>
           <Flash2>Segger\JL2CM3.dll</Flash2>
           <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
@@ -359,7 +360,7 @@
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>EMW3161 USE_STDPERIPH_DRIVER</Define>
+              <Define>EMW3161 USE_STDPERIPH_DRIVER STM32F2XX</Define>
               <Undefine></Undefine>
               <IncludePath></IncludePath>
             </VariousControls>
