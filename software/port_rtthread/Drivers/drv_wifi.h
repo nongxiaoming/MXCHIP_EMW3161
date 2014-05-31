@@ -19,4 +19,10 @@
 void stationModeStart(void);
 void softAPModeStart(void);
 int wifi_thread_init(void);
+ssize_t wifi_send(int sockfd, const void *buf, size_t len, int flags);
+ssize_t  wifi_sendto(int  sockfd,  const  void  *buf,  size_t  len,  int  flags,const  struct  sockaddr_t  *dest_addr, 
+				socklen_t addrlen);
+ssize_t wifi_recv(int sockfd, void *buf, size_t len, int flags);
+ssize_t wifi_recvfrom(int  sockfd,  void  *buf,  size_t  len,  int  flags,struct  sockaddr_t  *src_addr,  socklen_t 
+					*addrlen);
 #endif

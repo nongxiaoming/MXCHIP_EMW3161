@@ -29,14 +29,12 @@ If there is not enough memory for a connection:
 If the buffer is not setted, stack would use the default size: 2048bytes.
 */
 //#define DynamicMemAlloc          
-#define AP_NAME           "rtthread_11BG"
-#define AP_PASSWORD       "rtthread_finsh"
-#define WEB_SERVER				"www.baidu.com"
+#define AP_NAME           "rtthread_ddwrt"
+#define AP_PASSWORD       "rtthread"
 
 network_InitTypeDef_st wNetConfig;
 net_para_st para;
 static rt_mutex_t wifi_lock;
-
 	
 void userWatchDog(void)
 {
@@ -122,27 +120,66 @@ void RptConfigmodeRslt(network_InitTypeDef_st *nwkpara)
 																		nwkpara->wifi_key);
 	}
 }
+ssize_t wifi_send(int sockfd, const void *buf, size_t len, int flags)
+{
+	ssize_t size;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	size=send(sockfd, buf, len,flags);
+	rt_mutex_release(wifi_lock);
+	return size;
+}
+ssize_t wifi_sendto(int  sockfd,  const  void  *buf,  size_t  len,  int  flags,const  struct  sockaddr_t  *dest_addr, 
+				socklen_t addrlen)
+{
+	ssize_t size;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	size=sendto(sockfd, buf, len, flags,dest_addr, addrlen);
+	rt_mutex_release(wifi_lock);
+	return size;
+}
+ssize_t wifi_recv(int sockfd, void *buf, size_t len, int flags)
+{
+	ssize_t size;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	size=recv(sockfd, buf, len,flags);
+	rt_mutex_release(wifi_lock);
+	return size;
+}
+ssize_t wifi_recvfrom(int  sockfd,  void  *buf,  size_t  len,  int  flags,struct  sockaddr_t  *src_addr,  socklen_t 
+					*addrlen)
+{
+  ssize_t size;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	size=recvfrom(sockfd, buf, len,flags,src_addr,addrlen);
+	rt_mutex_release(wifi_lock);
+	return size;
+}
 void wifi_thread_entry(void* parameter)
 {
 	mxchipStartScan();
   stationModeStart();
   softAPModeStart();
 	while(1){
+		
 	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+		
   mxchipTick();
+		
   rt_mutex_release(wifi_lock);
-	rt_thread_delay(1);
+		
+	rt_thread_delay(5);
 	}
 }
 
 int wifi_thread_init(void)
 {
 	rt_thread_t tid;
+
   wifi_lock=rt_mutex_create("wifi",RT_IPC_FLAG_FIFO);
-	
+
 	tid = rt_thread_create("mx_wifi",
 								wifi_thread_entry, RT_NULL,
-								2048,RT_WIFI_ETHTHREAD_PRIORITY, 16);
+								2048,RT_WIFI_ETHTHREAD_PRIORITY, 5);
 
 	if (tid != RT_NULL)
 		rt_thread_startup(tid);
