@@ -120,6 +120,62 @@ void RptConfigmodeRslt(network_InitTypeDef_st *nwkpara)
 																		nwkpara->wifi_key);
 	}
 }
+ int wifi_socket(int domain, int type, int protocol)
+{
+  int ret;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	ret = socket(domain, type, protocol);
+	rt_mutex_release(wifi_lock);
+	return ret;
+}
+ int wifi_setsockopt(int sockfd, int level, int optname,const void *optval, socklen_t optlen)
+{
+  int ret;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	ret = setsockopt(sockfd, level, optname,optval, optlen);
+	rt_mutex_release(wifi_lock);
+	return ret;
+}
+ int wifi_bind(int sockfd, const struct sockaddr_t *addr, socklen_t addrlen)
+{
+  int ret;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	ret = bind(sockfd, addr, addrlen);
+	rt_mutex_release(wifi_lock);
+	return ret;
+}
+ int wifi_connect(int sockfd, const struct sockaddr_t *addr, socklen_t addrlen)
+{
+  int ret;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	ret = connect(sockfd, addr, addrlen);
+	rt_mutex_release(wifi_lock);
+	return ret;
+}
+ int wifi_listen(int sockfd, int backlog)
+{
+	int ret;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	ret = listen(sockfd , backlog);
+	rt_mutex_release(wifi_lock);
+	return ret;
+}
+ int wifi_accept(int sockfd, struct sockaddr_t *addr, socklen_t *addrlen)
+{
+  int ret;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	ret = accept(sockfd,addr,addrlen);
+	rt_mutex_release(wifi_lock);
+	return ret;
+}
+ int wifi_select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval_t *timeout)
+{
+int ret;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	ret = select(nfds, readfds, writefds, exceptfds, timeout);
+	rt_mutex_release(wifi_lock);
+	return ret;
+}
 ssize_t wifi_send(int sockfd, const void *buf, size_t len, int flags)
 {
 	ssize_t size;
@@ -153,6 +209,30 @@ ssize_t wifi_recvfrom(int  sockfd,  void  *buf,  size_t  len,  int  flags,struct
 	size=recvfrom(sockfd, buf, len,flags,src_addr,addrlen);
 	rt_mutex_release(wifi_lock);
 	return size;
+}
+int wifi_read(int sockfd, void *buf, size_t len)
+{
+  int ret;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	ret = read(sockfd,buf,len);
+	rt_mutex_release(wifi_lock);
+	return ret;
+}
+int wifi_write(int sockfd, void *buf, size_t len)
+{
+  int ret;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	ret = write(sockfd,buf,len);
+	rt_mutex_release(wifi_lock);
+	return ret;
+}
+int wifi_close(int fd)
+{
+  int ret;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	ret = close(fd);
+	rt_mutex_release(wifi_lock);
+	return ret;
 }
 void wifi_thread_entry(void* parameter)
 {

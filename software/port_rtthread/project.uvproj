@@ -415,6 +415,11 @@
               <FileType>1</FileType>
               <FilePath>applications\startup.c</FilePath>
             </File>
+            <File>
+              <FileName>tcpserver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\applications\tcpserver.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

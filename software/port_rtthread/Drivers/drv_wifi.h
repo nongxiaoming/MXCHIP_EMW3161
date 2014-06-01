@@ -19,10 +19,23 @@
 void stationModeStart(void);
 void softAPModeStart(void);
 int wifi_thread_init(void);
+
+/* wifiÍøÂçÏà¹ØAPI*/
+ int wifi_socket(int domain, int type, int protocol);
+ int wifi_setsockopt(int sockfd, int level, int optname,const void *optval, socklen_t optlen);
+ int wifi_bind(int sockfd, const struct sockaddr_t *addr, socklen_t addrlen);
+ int wifi_connect(int sockfd, const struct sockaddr_t *addr, socklen_t addrlen);
+ int wifi_listen(int sockfd, int backlog);
+ int wifi_accept(int sockfd, struct sockaddr_t *addr, socklen_t *addrlen);
+ int wifi_select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval_t *timeout);
 ssize_t wifi_send(int sockfd, const void *buf, size_t len, int flags);
 ssize_t  wifi_sendto(int  sockfd,  const  void  *buf,  size_t  len,  int  flags,const  struct  sockaddr_t  *dest_addr, 
 				socklen_t addrlen);
 ssize_t wifi_recv(int sockfd, void *buf, size_t len, int flags);
 ssize_t wifi_recvfrom(int  sockfd,  void  *buf,  size_t  len,  int  flags,struct  sockaddr_t  *src_addr,  socklen_t 
 					*addrlen);
+int wifi_read(int sockfd, void *buf, size_t len); 
+int wifi_write(int sockfd, void *buf, size_t len); 
+int wifi_close(int fd);
+
 #endif
