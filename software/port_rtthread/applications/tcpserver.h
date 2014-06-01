@@ -2,9 +2,9 @@
 #define __TCPSERVER_H
 #include <rtthread.h>
 #include "board.h"
+#include "drv_wifi.h"
 
-
-void tcp_update_init(void);
-
+void tcpserver_init(void);
+int  tcp_send(const void *buf, size_t len);
 #endif 
 

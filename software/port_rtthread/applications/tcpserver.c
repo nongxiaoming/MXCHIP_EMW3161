@@ -1,57 +1,55 @@
-#include "drv_wifi.h"
-
 #include "tcpserver.h"
 
+#ifdef RT_USING_FINSH
 #include <finsh.h>
+#endif
 
-
+/* TCP Server 监听的端口号 */
 #define LISTEN_PORT 8888
-#define BUF_SIZE 256
+/* 允许的最大客户端连接个数 */
+#define MAX_CLIENT_NUM 4
 
-
+int clientfd[MAX_CLIENT_NUM];
 
 
 void tcpserver_thread_entry(void *p)
 {
-  int i, j, fd_listen = -1, fd_udp = -1, fd_client = -1;
-  char *buf, ip_address[16],ipstr[32];
-  int len;
-  int con = -1;
-	int opt = 0;
-  int clientfd[8];
+  int i, new_client, fd_listen = -1;
+  char *buf, ip_address[16];
+  int count = -1;
+  
   fd_set readfds, exceptfds;
-  struct timeval_t t;
+  struct timeval_t timeout;
   struct sockaddr_t addr;
   socklen_t addrLen;
-  int timeout = 1;
+
 	int bufferSize;
 	
-	  for(i=0;i<4;i++) 
+	  for(i=0;i<MAX_CLIENT_NUM;i++) 
     clientfd[i] = -1;
 
   buf = (char*)malloc(1*1024);
 	
-     t.tv_sec = 0;
-  t.tv_usec = 100;
-	
+	/*设置select的超时时间*/
+  timeout.tv_sec = 0;
+  timeout.tv_usec = 100;
+	/*设置TCP检测是否断开时间*/
   set_tcp_keepalive(3, 60);
 	
-	while(1){
-	/*Establish a TCP server that accept the tcp clients connections*/
-		if (fd_listen==-1) {
-      fd_listen = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);		
+	/*建立TCPServer 监听*/
+	fd_listen = wifi_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);		
 			  bufferSize = 5*1024;
-				setsockopt(fd_listen,0,SO_RDBUFLEN,&bufferSize,4);
+				wifi_setsockopt(fd_listen,0,SO_RDBUFLEN,&bufferSize,4);
 				bufferSize = 5*1024;
-				setsockopt(fd_listen,0,SO_WRBUFLEN,&bufferSize,4);
-      addr.s_port = 8080;
-      bind(fd_listen, &addr, sizeof(addr));
-      listen(fd_listen, 0);
-      rt_kprintf("TCP server established at port: %d \r\n", addr.s_port);
-    }
+				wifi_setsockopt(fd_listen,0,SO_WRBUFLEN,&bufferSize,4);
+      addr.s_port = LISTEN_PORT;
+      wifi_bind(fd_listen, &addr, sizeof(addr));
+      wifi_listen(fd_listen, 0);
+      rt_kprintf("TCP Server listen at port: %d \r\n", addr.s_port);
+			
+	while(1){
 
-		
-		/*Check status on erery sockets */
+		/* 检测是否有客户端断开 */
 		FD_ZERO(&readfds);
 		FD_SET(fd_listen, &readfds);	
 		for(i=0;i<4;i++) {
@@ -59,18 +57,18 @@ void tcpserver_thread_entry(void *p)
 				FD_SET(clientfd[i], &readfds);
 		}
 		
-		select(1, &readfds, NULL, &exceptfds, &t);
+		wifi_select(1, &readfds, NULL, &exceptfds, &timeout);
     
-    /*Check tcp connection requests */
+    /* 检测是否有新的连接连入 */
 		if(FD_ISSET(fd_listen, &readfds))
 		{
-			j = accept(fd_listen, &addr, &len);
-			if (j > 0) {
+			new_client = wifi_accept(fd_listen, &addr, &addrLen);
+			if (new_client > 0) {
 			  inet_ntoa(ip_address, addr.s_ip );
 			  rt_kprintf("Client %s:%d connected\r\n", ip_address, addr.s_port);
-			  for(i=0;i<4;i++) {
+			  for(i=0;i<MAX_CLIENT_NUM;i++) {
 				  if (clientfd[i] == -1) {
-					  clientfd[i] = j;
+					  clientfd[i] = new_client;
 					  break;
 				  }
 			  }
@@ -78,15 +76,16 @@ void tcpserver_thread_entry(void *p)
 		}
 		
     
-   /*Read data from tcp clients and send data back */ 
-	 for(i=0;i<4;i++) {
+   /* 读出接收到的数据，并回发 */ 
+	 for(i=0;i<MAX_CLIENT_NUM;i++) {
       if (clientfd[i] != -1) {
         if (FD_ISSET(clientfd[i], &readfds)) {
-          con = wifi_recv(clientfd[i], buf, 1*1024, 0);
-          if (con > 0) 
-            wifi_send(clientfd[i], buf, con, 0);
+          count = wifi_recv(clientfd[i], buf, 1*1024, 0);
+          if (count > 0) {
+            wifi_send(clientfd[i], buf, count, 0);
+					}
           else {
-            close(clientfd[i]);
+            wifi_close(clientfd[i]);
             clientfd[i] = -1;
           }
         }
@@ -94,9 +93,24 @@ void tcpserver_thread_entry(void *p)
           clientfd[i] = -1;
       }
     }
-		
+	  rt_thread_delay(5);	
 	}
 }
+int tcp_send(const void *buf, size_t len)
+{
+	rt_uint8_t i;
+	int ret=-1;
+   /* 发送数据给连接上的每个客户端 */ 
+	 for(i=0;i<MAX_CLIENT_NUM;i++) {
+      if (clientfd[i] != -1) {
+			 ret=wifi_send(clientfd[i], buf, len, 0);
+			}
+ }
+	 return ret;
+}
+#ifdef RT_USING_FINSH
+FINSH_FUNCTION_EXPORT(tcp_send,send data to client);
+#endif
 void tcpserver_init(void)
 {
   rt_thread_t tcpserver_thread;
@@ -105,7 +119,9 @@ void tcpserver_init(void)
 	  if(tcpserver_thread!=RT_NULL)
     rt_thread_startup(tcpserver_thread);
 }
-
+#ifdef RT_USING_FINSH
+FINSH_FUNCTION_EXPORT(tcpserver_init,init the tcpserver);
+#endif
 
 
 
