@@ -234,35 +234,37 @@ int wifi_close(int fd)
 	rt_mutex_release(wifi_lock);
 	return ret;
 }
-void wifi_thread_entry(void* parameter)
-{
-	mxchipStartScan();
-  stationModeStart();
-  softAPModeStart();
-	while(1){
-		
-	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
-		
-  mxchipTick();
-		
-  rt_mutex_release(wifi_lock);
-		
-	rt_thread_delay(5);
-	}
-}
+//void wifi_thread_entry(void* parameter)
+//{
+//	mxchipStartScan();
+//  stationModeStart();
+//  softAPModeStart();
+//	while(1){
+//		
+//	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+//		
+//  mxchipTick();
+//		
+//  rt_mutex_release(wifi_lock);
+//		
+//	rt_thread_delay(5);
+//	}
+//}
 
 int wifi_thread_init(void)
 {
-	rt_thread_t tid;
+//	rt_thread_t tid;
 
   wifi_lock=rt_mutex_create("wifi",RT_IPC_FLAG_FIFO);
+   	mxchipStartScan();
+  stationModeStart();
+  softAPModeStart();
+//	tid = rt_thread_create("mx_wifi",
+//								wifi_thread_entry, RT_NULL,
+//								2048,RT_WIFI_ETHTHREAD_PRIORITY, 5);
 
-	tid = rt_thread_create("mx_wifi",
-								wifi_thread_entry, RT_NULL,
-								2048,RT_WIFI_ETHTHREAD_PRIORITY, 5);
-
-	if (tid != RT_NULL)
-		rt_thread_startup(tid);
+//	if (tid != RT_NULL)
+//		rt_thread_startup(tid);
 
 	return 0;
 }
