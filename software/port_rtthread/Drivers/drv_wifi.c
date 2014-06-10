@@ -29,14 +29,12 @@ If there is not enough memory for a connection:
 If the buffer is not setted, stack would use the default size: 2048bytes.
 */
 //#define DynamicMemAlloc          
-#define AP_NAME           "rtthread_11BG"
-#define AP_PASSWORD       "rtthread_finsh"
-#define WEB_SERVER				"www.baidu.com"
+#define AP_NAME           "rtthread_ddwrt"
+#define AP_PASSWORD       "rtthread"
 
 network_InitTypeDef_st wNetConfig;
 net_para_st para;
 static rt_mutex_t wifi_lock;
-
 	
 void userWatchDog(void)
 {
@@ -122,30 +120,151 @@ void RptConfigmodeRslt(network_InitTypeDef_st *nwkpara)
 																		nwkpara->wifi_key);
 	}
 }
-void wifi_thread_entry(void* parameter)
+ int wifi_socket(int domain, int type, int protocol)
 {
-	mxchipStartScan();
-  stationModeStart();
-  softAPModeStart();
-	while(1){
+  int ret;
 	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
-  mxchipTick();
-  rt_mutex_release(wifi_lock);
-	rt_thread_delay(1);
-	}
+	ret = socket(domain, type, protocol);
+	rt_mutex_release(wifi_lock);
+	return ret;
 }
+ int wifi_setsockopt(int sockfd, int level, int optname,const void *optval, socklen_t optlen)
+{
+  int ret;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	ret = setsockopt(sockfd, level, optname,optval, optlen);
+	rt_mutex_release(wifi_lock);
+	return ret;
+}
+ int wifi_bind(int sockfd, const struct sockaddr_t *addr, socklen_t addrlen)
+{
+  int ret;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	ret = bind(sockfd, addr, addrlen);
+	rt_mutex_release(wifi_lock);
+	return ret;
+}
+ int wifi_connect(int sockfd, const struct sockaddr_t *addr, socklen_t addrlen)
+{
+  int ret;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	ret = connect(sockfd, addr, addrlen);
+	rt_mutex_release(wifi_lock);
+	return ret;
+}
+ int wifi_listen(int sockfd, int backlog)
+{
+	int ret;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	ret = listen(sockfd , backlog);
+	rt_mutex_release(wifi_lock);
+	return ret;
+}
+ int wifi_accept(int sockfd, struct sockaddr_t *addr, socklen_t *addrlen)
+{
+  int ret;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	ret = accept(sockfd,addr,addrlen);
+	rt_mutex_release(wifi_lock);
+	return ret;
+}
+ int wifi_select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval_t *timeout)
+{
+int ret;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	ret = select(nfds, readfds, writefds, exceptfds, timeout);
+	rt_mutex_release(wifi_lock);
+	return ret;
+}
+ssize_t wifi_send(int sockfd, const void *buf, size_t len, int flags)
+{
+	ssize_t size;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	size=send(sockfd, buf, len,flags);
+	rt_mutex_release(wifi_lock);
+	return size;
+}
+ssize_t wifi_sendto(int  sockfd,  const  void  *buf,  size_t  len,  int  flags,const  struct  sockaddr_t  *dest_addr, 
+				socklen_t addrlen)
+{
+	ssize_t size;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	size=sendto(sockfd, buf, len, flags,dest_addr, addrlen);
+	rt_mutex_release(wifi_lock);
+	return size;
+}
+ssize_t wifi_recv(int sockfd, void *buf, size_t len, int flags)
+{
+	ssize_t size;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	size=recv(sockfd, buf, len,flags);
+	rt_mutex_release(wifi_lock);
+	return size;
+}
+ssize_t wifi_recvfrom(int  sockfd,  void  *buf,  size_t  len,  int  flags,struct  sockaddr_t  *src_addr,  socklen_t 
+					*addrlen)
+{
+  ssize_t size;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	size=recvfrom(sockfd, buf, len,flags,src_addr,addrlen);
+	rt_mutex_release(wifi_lock);
+	return size;
+}
+int wifi_read(int sockfd, void *buf, size_t len)
+{
+  int ret;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	ret = read(sockfd,buf,len);
+	rt_mutex_release(wifi_lock);
+	return ret;
+}
+int wifi_write(int sockfd, void *buf, size_t len)
+{
+  int ret;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	ret = write(sockfd,buf,len);
+	rt_mutex_release(wifi_lock);
+	return ret;
+}
+int wifi_close(int fd)
+{
+  int ret;
+	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+	ret = close(fd);
+	rt_mutex_release(wifi_lock);
+	return ret;
+}
+//void wifi_thread_entry(void* parameter)
+//{
+//	mxchipStartScan();
+//  stationModeStart();
+//  softAPModeStart();
+//	while(1){
+//		
+//	rt_mutex_take(wifi_lock,RT_WAITING_FOREVER);
+//		
+//  mxchipTick();
+//		
+//  rt_mutex_release(wifi_lock);
+//		
+//	rt_thread_delay(5);
+//	}
+//}
 
 int wifi_thread_init(void)
 {
-	rt_thread_t tid;
-  wifi_lock=rt_mutex_create("wifi",RT_IPC_FLAG_FIFO);
-	
-	tid = rt_thread_create("mx_wifi",
-								wifi_thread_entry, RT_NULL,
-								2048,RT_WIFI_ETHTHREAD_PRIORITY, 16);
+//	rt_thread_t tid;
 
-	if (tid != RT_NULL)
-		rt_thread_startup(tid);
+  wifi_lock=rt_mutex_create("wifi",RT_IPC_FLAG_FIFO);
+   	mxchipStartScan();
+  stationModeStart();
+  softAPModeStart();
+//	tid = rt_thread_create("mx_wifi",
+//								wifi_thread_entry, RT_NULL,
+//								2048,RT_WIFI_ETHTHREAD_PRIORITY, 5);
+
+//	if (tid != RT_NULL)
+//		rt_thread_startup(tid);
 
 	return 0;
 }

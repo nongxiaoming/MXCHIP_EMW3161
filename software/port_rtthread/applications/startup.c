@@ -77,46 +77,33 @@ void rtthread_startup(void)
 	/* show version */
 	rt_show_version();
 
-	/* init tick */
-	rt_system_tick_init();
-
-	/* init kernel object */
-	rt_system_object_init();
-
-	/* init timer system */
-	rt_system_timer_init();
-
 #ifdef RT_USING_HEAP
     rt_system_heap_init((void*)HEAP_BEGIN, (void*)HEAP_END);
 #endif
+	
+    /* initialize scheduler system */
+    rt_system_scheduler_init();
+	
+    /* initialize system timer*/
+    rt_system_timer_init();
+	
+	  wifi_low_level();
+	  uart_config();
+    /* initialize application */
+    rt_application_init();
 
-	/* init scheduler system */
-	rt_system_scheduler_init();
-
-#ifdef RT_USING_DFS
-	/* init sdcard driver */
-	rt_hw_msd_init();
-#endif
-   	wifi_low_level();
-	//rt_hw_rtc_init();
-uart_config();
-	/* init all device */
-	rt_device_init_all();
-
-	/* init application */
-	rt_application_init();
-
-    /* init timer thread */
+    /* initialize timer thread */
     rt_system_timer_thread_init();
 
-	/* init idle thread */
-	rt_thread_idle_init();
+    /* initialize idle thread */
+    rt_thread_idle_init();
 
-	/* start scheduler */
-	rt_system_scheduler_start();
+    /* start scheduler */
+    rt_system_scheduler_start();
 
-	/* never reach here */
-	return ;
+    /* never reach here */
+    return ;
+
 }
 
 int main(void)
