@@ -33,12 +33,12 @@
 void wifi_low_level(void)
 {
 	lib_config_t config;
-	config.tcp_buf_dynamic = mxEnable;
+	config.tcp_buf_dynamic = 1;
   config.tcp_max_connection_num = 12;
   config.tcp_rx_size = 2048;
   config.tcp_tx_size = 2048;
   config.hw_watchdog = 0;
-  config.wifi_channel = WIFI_CHANNEL_1_13;
+  config.wifi_channel = WIFI_CHANEEL_1_13;
 	lib_config(&config);
 	mxchipInit();
 }

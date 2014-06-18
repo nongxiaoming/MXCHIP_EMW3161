@@ -14,6 +14,7 @@
 
 #include <rtthread.h>
 #include "drv_wifi.h"
+#include "mxchipWNet_TypeDef.h"
 
 #define RT_WIFI_ETHTHREAD_PRIORITY	14
 /*
